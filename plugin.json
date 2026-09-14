@@ -1,0 +1,23 @@
+{
+  "name": "extra",
+  "version": "1.0.0",
+  "engine": ">=1.1.0",
+  "namespace": "extra",
+  "toolsDir": "tools",
+  "oauthProviders": [],
+  "system": {
+    "apk": [
+      "chromium",
+      "nss",
+      "freetype",
+      "harfbuzz",
+      "ca-certificates",
+      "ttf-freefont",
+      "font-noto-emoji"
+    ],
+    "env": {
+      "PUPPETEER_SKIP_DOWNLOAD": "true",
+      "PUPPETEER_EXECUTABLE_PATH": "/usr/bin/chromium-browser"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@polyant-ai/plugin-extra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@marp-team/marp-core": "^4.3.0",
+    "markdown-it": "^14.1.1",
+    "mustache": "^4.2.0",
+    "puppeteer": "^24.43.1",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "@polyant-ai/plugin-sdk": "*"
+  },
+  "devDependencies": {
+    "@polyant-ai/plugin-sdk": "git+https://github.com/polyant-ai/polyant-sdk.git#v1.7.0",
+    "@types/markdown-it": "^14.1.2",
+    "@types/mustache": "^4.2.6",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.2.0"
+  }
+}
