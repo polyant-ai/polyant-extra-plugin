@@ -576,7 +576,7 @@ export default defineTool({
 
         const filename = sanitizeFilename(params.filename);
         // The bytes stay in the engine; the model only ever sees the handle.
-        const fileHandle = ctx.artifacts.put({
+        const fileHandle = await ctx.artifacts.put({
           buffer,
           filename,
           mime: "application/pdf",
