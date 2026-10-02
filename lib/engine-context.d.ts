@@ -9,6 +9,10 @@
  * of the same conversation: another plugin renders a PDF and hands back a
  * handle, `file` consumes it. Neither plugin can import the other, and the
  * bytes must never travel through the model.
+ *
+ * Its shape mirrors the SDK 1.9.0 `ArtifactApi`: `put`/`take` may answer
+ * synchronously (in-process) or with a Promise (dev mode), so call sites always
+ * `await` them. Drop this entry when the SDK dependency moves to 1.9.0.
  */
 import "@polyant-ai/plugin-sdk";
 
@@ -19,10 +23,13 @@ declare module "@polyant-ai/plugin-sdk" {
       put(
         payload: { buffer: Buffer; filename: string; mime: string },
         ttlMs?: number,
-      ): string;
+      ): string | Promise<string>;
       take(
         handle: string,
-      ): { buffer: Buffer; filename: string; mime: string } | null;
+      ):
+        | { buffer: Buffer; filename: string; mime: string }
+        | null
+        | Promise<{ buffer: Buffer; filename: string; mime: string } | null>;
     };
   }
 }
