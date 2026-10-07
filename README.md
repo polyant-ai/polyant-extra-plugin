@@ -11,10 +11,11 @@ The plugin namespace is `extra`, so the engine registers each tool as
 | Tool | What it does |
 | --- | --- |
 | `extra:markdownToPdf` | render Markdown to PDF (default, enterprise-branded, or a custom Marp template) and return a handle to the bytes |
+| `extra:fileUpload` | upload a current message attachment or base64 data (max 10 MB) to the agent's S3 bucket and return its key and URL |
 
 ## Why it is a plugin
 
-This is the only thing in the product that needs a browser. Keeping it in the
+`markdownToPdf` is the only thing in the product that needs a browser. Keeping it in the
 engine meant every image carried `puppeteer`, Alpine's `chromium` and its font
 and rendering libraries — about 300MB and a large attack surface — whether or not
 the deployment ever rendered a page.
@@ -41,6 +42,20 @@ executable path points at the distro package.
 `PDF_CONCURRENCY` (default 3, range 1–32) caps parallel renders. Each one holds a
 Chromium page at roughly 50–100MB, so it is a memory bound rather than a
 throughput setting.
+
+## S3 credentials for `extra:fileUpload`
+
+The tool reads four agent secrets, all required: `s3_bucket_name`, `aws_region`,
+`aws_access_key_id` and `aws_secret_access_key`. They are the names the engine's
+former `fileUpload` used, so an agent that had it configured only needs
+`extra:fileUpload` enabled in place of `fileUpload`.
+
+The S3 client is always built with those static keys. There is no task-role mode
+and no fallback to the AWS default provider chain, so an agent can never act with
+the deployment's own identity: when a key is missing the tool returns
+`not_configured` and sends nothing. Files go under
+`{instanceId}/{conversationId}/{filename}`, and the latest upload is kept in
+conversation state as `lastUploadedFile`.
 
 ## The file handoff
 
