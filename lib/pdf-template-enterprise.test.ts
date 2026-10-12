@@ -27,7 +27,7 @@ describe("pdf-template-enterprise", () => {
       brandLogoSrc: "data:image/png;base64,iVBORw0KGgo=",
       documentTitle: "Blueprint della proposta",
       documentSubtitle: "Preparato per Mario Rossi · Maggio 2026",
-      brandFooterText: "Exelab · polyant.ai",
+      brandFooterText: "Acme Inc. · acme.com",
       documentDate: "Milano, 15 maggio 2026",
     };
 
@@ -59,12 +59,12 @@ describe("pdf-template-enterprise", () => {
       expect(bodyHtml).not.toContain('class="cover-subtitle"');
     });
 
-    it("falls back to an italian date when documentDate is null", () => {
+    it("falls back to an English date when documentDate is null", () => {
       const { bodyHtml } = renderEnterpriseHtml({ ...base, documentDate: null });
       const match = bodyHtml.match(/class="cover-date">([^<]+)</);
       expect(match).not.toBeNull();
-      const italianMonths = /(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)/i;
-      expect(match![1]).toMatch(italianMonths);
+      const englishMonths = /(January|February|March|April|May|June|July|August|September|October|November|December)/i;
+      expect(match![1]).toMatch(englishMonths);
     });
 
     it("escapes HTML in user-provided fields", () => {
@@ -88,7 +88,7 @@ describe("pdf-template-enterprise", () => {
 
     it("returns a footer template containing brand text and page placeholders", () => {
       const { footerTemplate } = renderEnterpriseHtml(base);
-      expect(footerTemplate).toContain("Exelab · polyant.ai");
+      expect(footerTemplate).toContain("Acme Inc. · acme.com");
       expect(footerTemplate).toContain('class="pageNumber"');
       expect(footerTemplate).toContain('class="totalPages"');
     });
@@ -97,7 +97,7 @@ describe("pdf-template-enterprise", () => {
       const { footerTemplate } = renderEnterpriseHtml({ ...base, brandFooterText: null });
       expect(footerTemplate).toContain('class="pageNumber"');
       expect(footerTemplate).toContain('class="totalPages"');
-      expect(footerTemplate).not.toContain("Exelab");
+      expect(footerTemplate).not.toContain("Acme");
     });
 
     it("uses a plain span placeholder when brandLogoSrc is null in the header", () => {

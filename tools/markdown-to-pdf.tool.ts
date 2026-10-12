@@ -334,64 +334,64 @@ function sanitizeFilename(name: string): string {
 export default defineTool({
   name: "markdownToPdf",
   description:
-    "Genera un PDF A4 a partire da contenuto Markdown.\n" +
-    "Accetta GFM-style tables, liste, code blocks, link, immagini, blockquote.\n" +
-    "Opzionalmente accetta headerImageUrl: un URL https:// pubblico (es. logo aziendale) che viene renderizzato come PRIMO elemento del documento, allineato a destra, prima del contenuto Markdown. Visibile sulla prima pagina.\n" +
-    "Per output enterprise (cover page, brand colors, header/footer con paginazione) passa template=\"enterprise\" + brandAccentHex + brandLogoUrl + documentTitle.\n" +
-    "Restituisce un pdfHandle opaco (valido per 10 minuti) consumabile da tool successivi (es. hubspotFile) per evitare di passare il binario tra tool call.\n" +
-    "Limite input: 100KB di markdown. Limite output: 10MB.",
+    "Generate an A4 PDF from Markdown content.\n" +
+    "Accepts GFM-style tables, lists, code blocks, links, images, blockquotes.\n" +
+    "Optionally accepts headerImageUrl: a public https:// URL (e.g. a company logo) rendered as the FIRST element of the document, right-aligned, before the Markdown content. Visible on the first page.\n" +
+    "For enterprise output (cover page, brand colors, header/footer with pagination) pass template=\"enterprise\" + brandAccentHex + brandLogoUrl + documentTitle.\n" +
+    "Returns an opaque fileHandle (valid for 10 minutes) consumable by a follow-up tool (e.g. extra:fileUpload, hubspot:file) to avoid passing the binary between tool calls.\n" +
+    "Input limit: 100KB of markdown. Output limit: 10MB.",
   category: "document",
   inputExamples: [
     {
-      label: "Riepilogo preventivo (default)",
+      label: "Quote summary",
       input: {
-        markdown: "# Preventivo n. 2026-001\n\n**Cliente:** Mario Rossi\n\n| Voce | Importo |\n|---|---|\n| Servizio A | €100 |\n| Servizio B | €250 |\n\n**Totale: €350**",
-        filename: "preventivo-2026-001",
+        markdown: "# Quote no. 2026-001\n\n**Customer:** Jane Doe\n\n| Item | Amount |\n|---|---|\n| Service A | $100 |\n| Service B | $250 |\n\n**Total: $350**",
+        filename: "quote-2026-001",
         headerImageUrl: null,
       },
     },
     {
-      label: "Proposta con logo aziendale in header (default)",
+      label: "Proposal with company logo in the header",
       input: {
-        markdown: "# Proposta\n\nGentile Cliente,\n\nin allegato la proposta.",
-        filename: "proposta-cliente",
+        markdown: "# Proposal\n\nDear Customer,\n\nplease find the proposal attached.",
+        filename: "customer-proposal",
         headerImageUrl: "https://cdn.example.com/logo.png",
       },
     },
     {
-      label: "Documento enterprise con cover, brand e paginazione",
+      label: "Enterprise document with cover, brand and pagination",
       input: {
-        markdown: "# Sezione 1\n\nContenuto della prima sezione.\n\n# Sezione 2\n\nContenuto della seconda sezione.",
-        filename: "documento-enterprise",
+        markdown: "# Section 1\n\nContent of the first section.\n\n# Section 2\n\nContent of the second section.",
+        filename: "enterprise-document",
         template: "enterprise",
         brandAccentHex: "#F16034",
         brandLogoUrl: "https://cdn.example.com/logo.png",
-        documentTitle: "Titolo del documento",
-        documentSubtitle: "Preparato per Mario Rossi · Maggio 2026",
-        brandFooterText: "Acme Srl · acme.com",
-        documentDate: "Milano, 15 maggio 2026",
+        documentTitle: "Document title",
+        documentSubtitle: "Prepared for Jane Doe · May 2026",
+        brandFooterText: "Acme Inc. · acme.com",
+        documentDate: "London, 15 May 2026",
       },
     },
     {
-      label: "Template Marp+Mustache custom passato dal chiamante (inline)",
+      label: "Custom Marp+Mustache template supplied by the caller (inline)",
       input: {
         markdown: "n/a",
-        filename: "documento-marp",
+        filename: "marp-document",
         template: "marp-custom",
-        templateMarp: "---\nmarp: true\ntheme: custom-a\nsize: A4\nhtml: true\n---\n# {{titolo}}\n\nCiao **{{nome}}**.",
+        templateMarp: "---\nmarp: true\ntheme: custom-a\nsize: A4\nhtml: true\n---\n# {{title}}\n\nHello **{{name}}**.",
         templateCss: "/* @theme custom-a */\nsection { background: #FFF; color: #111; padding: 20mm; font-family: sans-serif; }",
-        templateData: "{\"titolo\":\"Esempio\",\"nome\":\"Mario Rossi\"}",
+        templateData: "{\"title\":\"Example\",\"name\":\"Jane Doe\"}",
       },
     },
     {
-      label: "Template Marp custom da URL (preferito per template >5KB)",
+      label: "Custom Marp template from a URL (preferred for templates >5KB)",
       input: {
         markdown: "n/a",
-        filename: "documento-marp-url",
+        filename: "marp-document-url",
         template: "marp-custom",
         templateMarpUrl: "https://cdn.example.com/template.md",
         templateCssUrl: "https://cdn.example.com/theme.css",
-        templateData: "{\"titolo\":\"Esempio\",\"nome\":\"Mario Rossi\"}",
+        templateData: "{\"title\":\"Example\",\"name\":\"Jane Doe\"}",
       },
     },
   ],
@@ -399,64 +399,64 @@ export default defineTool({
     markdown: z
       .string()
       .min(1)
-      .describe("Contenuto Markdown da convertire in PDF. Supporta GFM (tabelle, code blocks)."),
-      filename: z
-        .string()
-        .min(1)
-        .describe("Nome file desiderato senza estensione (es. 'preventivo-mario-rossi'). Estensione .pdf aggiunta automaticamente. Caratteri non sicuri sostituiti con '-'."),
-      headerImageUrl: z
-        .string()
-        .nullable()
-        .describe("Opzionale: URL HTTPS pubblico di un'immagine (es. logo aziendale) da mostrare come primo elemento del documento, allineata a destra, prima del contenuto Markdown. Visibile sulla prima pagina. Deve iniziare con https://. Se null, nessun logo. Ignorato quando template='enterprise' (usa brandLogoUrl)."),
-      template: z
-        .enum(["default", "enterprise", "marp-custom"])
-        .nullable()
-        .describe("Stile grafico. 'default' o null = stile base attuale. 'enterprise' = cover page + brand colors + header/footer con paginazione (richiede brandAccentHex, brandLogoUrl, documentTitle). 'marp-custom' = template Marp+Mustache arbitrario passato dal chiamante (richiede templateMarp, templateCss, templateData)."),
-      brandAccentHex: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': colore accent in formato hex 6 cifre (es. '#0066CC' o '#F16034'). Iniettato come CSS custom property --brand-accent (divisore cover, border-left H1, table header). Validato runtime."),
-      brandLogoUrl: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': URL HTTPS del logo aziendale. Logo grande nella cover, piccolo nell'header pagine 2+. Deve iniziare con https://."),
-      documentTitle: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': titolo principale mostrato nella cover (es. 'Blueprint della proposta'). Anche mostrato nell'header pagine 2+. Se null, fallback al primo H1 del markdown."),
-      documentSubtitle: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': sottotitolo cover (es. 'Preparato per Mario Rossi · Maggio 2026'). Se null, nessun sottotitolo."),
-      brandFooterText: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': testo del footer pagine 2+ (es. 'Exelab · polyant.ai' o 'Acme Srl · acme.com'). Se null, footer mostra solo la numerazione pagine."),
-      documentDate: z
-        .string()
-        .nullable()
-        .describe("Solo template='enterprise': data mostrata in basso nella cover (es. 'Milano, 15 maggio 2026'). Se null, viene generata oggi in italiano senza prefisso citta."),
-      templateMarp: z
-        .string()
-        .nullable()
-        .describe("Solo template='marp-custom': template Marp+Mustache passato inline. Alternativa a templateMarpUrl. Massimo 200KB. Sconsigliato per template grandi: l'LLM può tagliarli — preferire templateMarpUrl."),
-      templateCss: z
-        .string()
-        .nullable()
-        .describe("Solo template='marp-custom': theme CSS passato inline. Alternativa a templateCssUrl. Massimo 200KB. Sconsigliato per CSS grandi: l'LLM può sintetizzarli — preferire templateCssUrl."),
-      templateMarpUrl: z
-        .string()
-        .nullable()
-        .describe("Solo template='marp-custom': URL HTTPS pubblico da cui il tool scarica il template Marp+Mustache. Esclusivo con templateMarp. Deve iniziare con https://. Cachato in memoria per la durata del processo."),
-      templateCssUrl: z
-        .string()
-        .nullable()
-        .describe("Solo template='marp-custom': URL HTTPS pubblico da cui il tool scarica il theme CSS. Esclusivo con templateCss. Deve iniziare con https://. Cachato in memoria."),
-      templateData: z
-        .string()
-        .nullable()
-        .describe("Solo template='marp-custom': JSON string serializzato con i dati per Mustache. Deve parsare a un oggetto piatto chiave/valore. Esempio: '{\"cliente_nome\":\"Mario Rossi\",\"titolo\":\"...\"}'."),
-    }),
+      .describe("Markdown content to convert to PDF. Supports GFM (tables, code blocks)."),
+    filename: z
+      .string()
+      .min(1)
+      .describe("Desired file name without extension (e.g. 'customer-proposal'). The .pdf extension is added automatically. Unsafe characters are replaced with '-'."),
+    headerImageUrl: z
+      .string()
+      .nullable()
+      .describe("Optional: public HTTPS URL of an image (e.g. a company logo) shown as the first element of the document, right-aligned, before the Markdown content. Visible on the first page. Must start with https://. If null, no logo. Ignored when template='enterprise' (uses brandLogoUrl)."),
+    template: z
+      .enum(["default", "enterprise", "marp-custom"])
+      .nullable()
+      .describe("Visual style. 'default' or null = the basic style. 'enterprise' = cover page + brand colors + header/footer with pagination (requires brandAccentHex, brandLogoUrl, documentTitle). 'marp-custom' = arbitrary Marp+Mustache template supplied by the caller (requires templateMarp, templateCss, templateData)."),
+    brandAccentHex: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': accent color as a 6-digit hex (e.g. '#0066CC' or '#F16034'). Injected as the CSS custom property --brand-accent (cover divider, H1 left border, table header). Validated at runtime."),
+    brandLogoUrl: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': HTTPS URL of the company logo. Large on the cover, small in the header of pages 2+. Must start with https://."),
+    documentTitle: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': main title shown on the cover (e.g. 'Proposal blueprint'). Also shown in the header of pages 2+. If null, falls back to the first H1 of the markdown."),
+    documentSubtitle: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': cover subtitle (e.g. 'Prepared for Jane Doe · May 2026'). If null, no subtitle."),
+    brandFooterText: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': footer text for pages 2+ (e.g. 'Exelab · polyant.ai' or 'Acme Inc. · acme.com'). If null, the footer shows only the page numbering."),
+    documentDate: z
+      .string()
+      .nullable()
+      .describe("Only template='enterprise': date shown at the bottom of the cover (e.g. 'London, 15 May 2026'). If null, today's date is generated in English without a city prefix."),
+    templateMarp: z
+      .string()
+      .nullable()
+      .describe("Only template='marp-custom': Marp+Mustache template passed inline. Alternative to templateMarpUrl. Maximum 200KB. Discouraged for large templates because the LLM may truncate them: prefer templateMarpUrl."),
+    templateCss: z
+      .string()
+      .nullable()
+      .describe("Only template='marp-custom': theme CSS passed inline. Alternative to templateCssUrl. Maximum 200KB. Discouraged for large CSS because the LLM may summarize it: prefer templateCssUrl."),
+    templateMarpUrl: z
+      .string()
+      .nullable()
+      .describe("Only template='marp-custom': public HTTPS URL the tool downloads the Marp+Mustache template from. Mutually exclusive with templateMarp. Must start with https://. Cached in memory for the lifetime of the process."),
+    templateCssUrl: z
+      .string()
+      .nullable()
+      .describe("Only template='marp-custom': public HTTPS URL the tool downloads the theme CSS from. Mutually exclusive with templateCss. Must start with https://. Cached in memory."),
+    templateData: z
+      .string()
+      .nullable()
+      .describe("Only template='marp-custom': serialized JSON string with the data for Mustache. Must parse to a flat key/value object. Example: '{\"customer_name\":\"Jane Doe\",\"title\":\"...\"}'."),
+  }),
     execute: async (
       params: {
         markdown: string;
@@ -482,11 +482,11 @@ export default defineTool({
       // For marp-custom the `markdown` field is unused — the template comes from templateMarp.
       if (template !== "marp-custom" && params.markdown.length > MAX_MARKDOWN_LENGTH) {
         return {
-          error: `Markdown troppo lungo: ${params.markdown.length} caratteri (max ${MAX_MARKDOWN_LENGTH}).`,
+          error: `Markdown too long: ${params.markdown.length} characters (max ${MAX_MARKDOWN_LENGTH}).`,
         };
       }
       if (params.headerImageUrl && !/^https:\/\//.test(params.headerImageUrl)) {
-        return { error: "headerImageUrl deve essere un URL https:// assoluto." };
+        return { error: "headerImageUrl must be an absolute https:// URL." };
       }
 
       try {
@@ -497,42 +497,42 @@ export default defineTool({
           let resolvedTemplateMarp: string | null = null;
           if (params.templateMarp && params.templateMarp.trim().length > 0) {
             if (params.templateMarp.length > MAX_TEMPLATE_LENGTH) {
-              return { error: `templateMarp troppo lungo: ${params.templateMarp.length} caratteri (max ${MAX_TEMPLATE_LENGTH}).` };
+              return { error: `templateMarp too long: ${params.templateMarp.length} characters (max ${MAX_TEMPLATE_LENGTH}).` };
             }
             resolvedTemplateMarp = params.templateMarp;
           } else if (params.templateMarpUrl && params.templateMarpUrl.trim().length > 0) {
             if (!/^https:\/\//.test(params.templateMarpUrl)) {
-              return { error: "templateMarpUrl deve essere un URL https:// assoluto." };
+              return { error: "templateMarpUrl must be an absolute https:// URL." };
             }
             resolvedTemplateMarp = await resolveTextTemplate(params.templateMarpUrl);
             if (!resolvedTemplateMarp) {
-              return { error: `templateMarpUrl fetch fallito o template vuoto: ${params.templateMarpUrl}` };
+              return { error: `templateMarpUrl fetch failed or template is empty: ${params.templateMarpUrl}` };
             }
           } else {
-            return { error: "Per template='marp-custom' serve templateMarp inline OPPURE templateMarpUrl." };
+            return { error: "template='marp-custom' requires templateMarp inline OR templateMarpUrl." };
           }
 
           // Resolve templateCss from inline or URL.
           let resolvedTemplateCss: string | null = null;
           if (params.templateCss && params.templateCss.trim().length > 0) {
             if (params.templateCss.length > MAX_TEMPLATE_LENGTH) {
-              return { error: `templateCss troppo lungo: ${params.templateCss.length} caratteri (max ${MAX_TEMPLATE_LENGTH}).` };
+              return { error: `templateCss too long: ${params.templateCss.length} characters (max ${MAX_TEMPLATE_LENGTH}).` };
             }
             resolvedTemplateCss = params.templateCss;
           } else if (params.templateCssUrl && params.templateCssUrl.trim().length > 0) {
             if (!/^https:\/\//.test(params.templateCssUrl)) {
-              return { error: "templateCssUrl deve essere un URL https:// assoluto." };
+              return { error: "templateCssUrl must be an absolute https:// URL." };
             }
             resolvedTemplateCss = await resolveTextTemplate(params.templateCssUrl);
             if (!resolvedTemplateCss) {
-              return { error: `templateCssUrl fetch fallito o CSS vuoto: ${params.templateCssUrl}` };
+              return { error: `templateCssUrl fetch failed or CSS is empty: ${params.templateCssUrl}` };
             }
           } else {
-            return { error: "Per template='marp-custom' serve templateCss inline OPPURE templateCssUrl." };
+            return { error: "template='marp-custom' requires templateCss inline OR templateCssUrl." };
           }
 
           if (!params.templateData || params.templateData.trim().length === 0) {
-            return { error: "Per template='marp-custom' serve templateData non vuoto." };
+            return { error: "template='marp-custom' requires a non-empty templateData." };
           }
           const parsed = parseTemplateData(params.templateData);
           if (!parsed.ok) {
@@ -545,15 +545,15 @@ export default defineTool({
           });
         } else if (template === "enterprise") {
           if (!params.brandAccentHex || !HEX_COLOR_RE.test(params.brandAccentHex)) {
-            return { error: "brandAccentHex deve essere un hex code a 6 cifre (es. '#F16034')." };
+            return { error: "brandAccentHex must be a 6-digit hex code (e.g. '#F16034')." };
           }
           if (params.brandLogoUrl && !/^https:\/\//.test(params.brandLogoUrl)) {
-            return { error: "brandLogoUrl deve essere un URL https:// assoluto." };
+            return { error: "brandLogoUrl must be an absolute https:// URL." };
           }
           const titleFromMarkdown = (params.markdown.match(/^#\s+(.+)$/m)?.[1] ?? "").trim();
           const resolvedTitle = params.documentTitle ?? titleFromMarkdown;
           if (!resolvedTitle) {
-            return { error: "Per template='enterprise' serve documentTitle (oppure un H1 nel markdown da cui derivarlo)." };
+            return { error: "template='enterprise' requires documentTitle (or an H1 in the markdown to derive it from)." };
           }
           buffer = await generateEnterprisePdfBuffer({
             markdown: params.markdown,
@@ -570,7 +570,7 @@ export default defineTool({
 
         if (buffer.length > MAX_PDF_SIZE_BYTES) {
           return {
-            error: `PDF generato troppo grande: ${buffer.length} byte (max ${MAX_PDF_SIZE_BYTES}).`,
+            error: `Generated PDF too large: ${buffer.length} bytes (max ${MAX_PDF_SIZE_BYTES}).`,
           };
         }
 
@@ -588,10 +588,10 @@ export default defineTool({
           filename,
           sizeBytes: buffer.length,
           message:
-            "PDF generato. Passa fileHandle a un tool che carica file (es. hubspot:file) entro 10 minuti.",
+            "PDF generated. Pass fileHandle to a tool that uploads files (e.g. hubspot:file) within 10 minutes.",
         };
       } catch (err) {
-        return { error: `Errore generazione PDF: ${errMsg(err)}` };
+        return { error: `PDF generation error: ${errMsg(err)}` };
       }
     },
 });

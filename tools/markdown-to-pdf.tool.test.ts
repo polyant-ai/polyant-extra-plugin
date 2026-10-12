@@ -216,7 +216,7 @@ describe("markdownToPdf — input validation", () => {
       templateCssUrl: null,
       templateData: null,
     });
-    expect(result.error).toContain("Markdown troppo lungo");
+    expect(result.error).toContain("Markdown too long");
   });
 
   it("template='marp-custom' rejects missing templateMarp", async () => {
