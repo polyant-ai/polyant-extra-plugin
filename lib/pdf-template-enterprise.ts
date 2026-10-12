@@ -172,8 +172,8 @@ export function buildEnterpriseCss(accentHex: string): string {
 }
 
 
-function formatEnglishDate(d: Date): string {
-  return d.toLocaleDateString("en-GB", {
+function formatItalianDate(d: Date): string {
+  return d.toLocaleDateString("it-IT", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -200,7 +200,7 @@ export function renderEnterpriseHtml(opts: EnterpriseTemplateOptions): Enterpris
   const coverSubtitle = documentSubtitle
     ? `<p class="cover-subtitle">${escapeHtml(documentSubtitle)}</p>`
     : "";
-  const dateLabel = documentDate ?? formatEnglishDate(new Date());
+  const dateLabel = documentDate ?? formatItalianDate(new Date());
 
   const bodyHtml = `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(documentTitle)}</title><style>${css}</style></head><body><div class="cover">${coverLogo}<h1 class="cover-title">${escapeHtml(documentTitle)}</h1><div class="cover-divider"></div>${coverSubtitle}<div class="cover-date">${escapeHtml(dateLabel)}</div></div><div class="body">${bodyMarkdown}</div></body></html>`;
 

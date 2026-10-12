@@ -59,12 +59,12 @@ describe("pdf-template-enterprise", () => {
       expect(bodyHtml).not.toContain('class="cover-subtitle"');
     });
 
-    it("falls back to an English date when documentDate is null", () => {
+    it("falls back to an italian date when documentDate is null", () => {
       const { bodyHtml } = renderEnterpriseHtml({ ...base, documentDate: null });
       const match = bodyHtml.match(/class="cover-date">([^<]+)</);
       expect(match).not.toBeNull();
-      const englishMonths = /(January|February|March|April|May|June|July|August|September|October|November|December)/i;
-      expect(match![1]).toMatch(englishMonths);
+      const italianMonths = /(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)/i;
+      expect(match![1]).toMatch(italianMonths);
     });
 
     it("escapes HTML in user-provided fields", () => {

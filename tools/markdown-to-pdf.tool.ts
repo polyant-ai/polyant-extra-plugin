@@ -435,7 +435,7 @@ export default defineTool({
     documentDate: z
       .string()
       .nullable()
-      .describe("Only template='enterprise': date shown at the bottom of the cover (e.g. 'London, 15 May 2026'). If null, today's date is generated in English without a city prefix."),
+      .describe("Only template='enterprise': date shown at the bottom of the cover (e.g. 'London, 15 May 2026'). If null, today's date is generated in Italian (it-IT) without a city prefix."),
     templateMarp: z
       .string()
       .nullable()
