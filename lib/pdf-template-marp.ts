@@ -83,7 +83,7 @@ export function parseTemplateData(input: string): JsonParseResult | JsonParseErr
     return { ok: false, error: `JSON malformato: ${err instanceof Error ? err.message : String(err)}` };
   }
   if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
-    return { ok: false, error: "JSON deve essere un oggetto (chiave/valore), non array o primitivo" };
+    return { ok: false, error: "JSON must be an object (key/value), not an array or a primitive" };
   }
   return { ok: true, value: parsed as Record<string, unknown> };
 }
