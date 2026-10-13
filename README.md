@@ -18,7 +18,7 @@ artifact store, bound to the conversation and consumed by a single read, so anot
 
 ## Requirements
 
-- Polyant engine `>= 1.2.0` (declared in `plugin.json`)
+- Polyant engine `>= 1.3.0` (declared in `plugin.json`)
 - Plugin SDK `v1.9.0` (`@polyant-ai/plugin-sdk`, pinned in `package.json`)
 - An Alpine-based engine image built from source. `markdownToPdf` needs Chromium, which the
   plugin declares in `plugin.json` (`system.apk` and `system.env`); the engine's
