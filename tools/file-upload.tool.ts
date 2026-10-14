@@ -59,34 +59,62 @@ export default defineTool({
     "Files are stored under `{instanceId}/{conversationId}/{filename}`.\n" +
     "Upload a current message attachment (`attachmentIndex`) or raw base64 data (`base64Data`).\n" +
     "Returns the S3 key and a URL. Limit: 10 MB.",
+  summary: {
+    "en-US": "Uploads a file to the agent's S3 bucket.",
+    "it-IT": "Carica un file nel bucket S3 dell'agente.",
+  },
   category: "storage",
   requiredSecrets: [
     {
       key: "s3_bucket_name",
       type: "text",
-      label: "S3 bucket name",
-      description: "Bucket the agent's files are uploaded to.",
+      label: {
+        "en-US": "S3 bucket name",
+        "it-IT": "Nome del bucket S3",
+      },
+      description: {
+        "en-US": "Bucket the agent's files are uploaded to.",
+        "it-IT": "Bucket in cui vengono caricati i file dell'agente.",
+      },
       sensitive: false,
     },
     {
       key: "aws_region",
       type: "text",
-      label: "AWS region",
-      description: "Region of the bucket, for example eu-west-1.",
+      label: {
+        "en-US": "AWS region",
+        "it-IT": "Regione AWS",
+      },
+      description: {
+        "en-US": "Region of the bucket, for example eu-west-1.",
+        "it-IT": "Regione del bucket, per esempio eu-west-1.",
+      },
       sensitive: false,
     },
     {
       key: "aws_access_key_id",
       type: "text",
-      label: "AWS access key ID",
-      description: "Access key of an IAM identity allowed to write to the bucket.",
+      label: {
+        "en-US": "AWS access key ID",
+        "it-IT": "ID chiave di accesso AWS",
+      },
+      description: {
+        "en-US": "Access key of an IAM identity allowed to write to the bucket.",
+        "it-IT": "Chiave di accesso di un'identità IAM autorizzata a scrivere nel bucket.",
+      },
       sensitive: true,
     },
     {
       key: "aws_secret_access_key",
       type: "text",
-      label: "AWS secret access key",
-      description: "Secret of the access key above.",
+      label: {
+        "en-US": "AWS secret access key",
+        "it-IT": "Chiave di accesso segreta AWS",
+      },
+      description: {
+        "en-US": "Secret of the access key above.",
+        "it-IT": "Segreto della chiave di accesso qui sopra.",
+      },
       sensitive: true,
     },
   ],
