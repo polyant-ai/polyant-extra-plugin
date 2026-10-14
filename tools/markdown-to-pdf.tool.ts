@@ -340,6 +340,10 @@ export default defineTool({
     "For enterprise output (cover page, brand colors, header/footer with pagination) pass template=\"enterprise\" + brandAccentHex + brandLogoUrl + documentTitle.\n" +
     "Returns an opaque fileHandle (valid for 10 minutes) consumable by a follow-up tool (e.g. extra:fileUpload, hubspot:file) to avoid passing the binary between tool calls.\n" +
     "Input limit: 100KB of markdown. Output limit: 10MB.",
+  summary: {
+    "en-US": "Generates a PDF document from Markdown text.",
+    "it-IT": "Genera un documento PDF a partire da testo Markdown.",
+  },
   category: "document",
   inputExamples: [
     {
